@@ -1,6 +1,6 @@
 # AWS specific variables
 AWS_ACCOUNT_ID := $(shell aws sts get-caller-identity --query Account --output text)
-AWS_REGION ?= eu-central-1
+AWS_REGION ?= eu-north-1
 
 GITHUB_USER ?= lreimer
 
