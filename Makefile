@@ -1,10 +1,12 @@
+# AWS specific variables
 AWS_ACCOUNT_ID := $(shell aws sts get-caller-identity --query Account --output text)
 AWS_REGION ?= eu-central-1
+
 GITHUB_USER ?= lreimer
-GCP_PROJECT ?= cloud-native-experience-lab
 
 # https://app.electricitymaps.com/map?lang=de
 # https://cloud.google.com/compute/docs/regions-zones?hl=de#available
+GCP_PROJECT ?= cloud-native-experience-lab
 GCP_REGION ?= europe-north1
 GCP_ZONE ?= europe-north1-b
 
@@ -41,7 +43,7 @@ bootstrap-gke-flux2:
 		--personal
 
 create-eks-cluster:
-	@eksctl create cluster -f karpenter/green-eks-k8s.yaml
+	@eksctl create cluster -r $(AWS_REGION) -f karpenter/green-eks-k8s.yaml
 
 bootstrap-eks-flux2:
     @flux bootstrap github \
