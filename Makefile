@@ -34,7 +34,7 @@ create-gke-cluster:
 	@kubectl cluster-info
 
 bootstrap-gke-flux2:
-    @flux bootstrap github \
+	@flux bootstrap github \
 		--owner=$(GITHUB_USER) \
 		--repository=green-kubernetes \
 		--branch=main \
@@ -46,7 +46,7 @@ create-eks-cluster:
 	@eksctl create cluster -r $(AWS_REGION) -f karpenter/green-eks-k8s.yaml
 
 bootstrap-eks-flux2:
-    @flux bootstrap github \
+	@flux bootstrap github \
 		--owner=$(GITHUB_USER) \
 		--repository=green-kubernetes \
 		--branch=main \
