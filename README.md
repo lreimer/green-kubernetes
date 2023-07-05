@@ -7,8 +7,8 @@ Showcase repository to demonstrate sustainability projects for Kubernetes.
 ## Rightsizing with Vertical Pod Autoscaler
 
 ```bash
-kubectl apply -f examples/hamster.yaml
-kubectl apply -f examples/vpa.yaml
+kubectl apply -f vpa/hamster.yaml
+kubectl apply -f vpa/vpa.yaml
 kubectl describe vpa hamster-vpa
 
 helm repo add fairwinds-stable https://charts.fairwinds.com/stable
