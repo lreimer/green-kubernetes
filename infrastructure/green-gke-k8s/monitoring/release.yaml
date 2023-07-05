@@ -14,4 +14,3 @@ spec:
   interval: 1h0m0s
   releaseName: kube-prometheus-stack
   targetNamespace: monitoring
-  createNamespace: true
