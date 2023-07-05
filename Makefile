@@ -8,9 +8,6 @@ GCP_PROJECT ?= cloud-native-experience-lab
 GCP_REGION ?= europe-north1
 GCP_ZONE ?= europe-north1-b
 
-create-eks-cluster:
-	@eksctl create cluster -f karpenter/green-eks-k8s.yaml
-
 prepare-gke-cluster:
 	@gcloud config set compute/region europe-west1
 	@gcloud config set compute/zone europe-west1-b
@@ -33,6 +30,27 @@ create-gke-cluster:
     	--monitoring=SYSTEM
 	@kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$$(gcloud config get-value core/account)
 	@kubectl cluster-info
+
+bootstrap-gke-flux2:
+    @flux bootstrap github \
+		--owner=$(GITHUB_USER) \
+		--repository=green-kubernetes \
+		--branch=main \
+		--path=./clusters/green-gke-k8s \
+		--read-write-key \
+		--personal
+
+create-eks-cluster:
+	@eksctl create cluster -f karpenter/green-eks-k8s.yaml
+
+bootstrap-eks-flux2:
+    @flux bootstrap github \
+		--owner=$(GITHUB_USER) \
+		--repository=green-kubernetes \
+		--branch=main \
+		--path=./clusters/green-eks-k8s \
+		--read-write-key \
+		--personal
 
 delete-clusters: delete-eks-cluster delete-gke-cluster
 
