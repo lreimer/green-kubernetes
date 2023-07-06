@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - monitoring/
   - goldilocks/
+  - https://github.com/kube-green/kube-green/releases/download/v0.5.1/kube-green.yaml
