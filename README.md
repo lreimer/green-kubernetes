@@ -21,6 +21,29 @@ kubectl label ns default goldilocks.fairwinds.com/enabled=true
 
 ## kube-green
 
+Don't waste resources! Many workloads on dev/qa environments stay running during weekends,
+non working hours or at night. _kube-green_ is a simple K8s addon to automatically shutdown
+and restart resources based on when they are needed (or not).
+
+```yaml
+apiVersion: kube-green.com/v1alpha1
+kind: SleepInfo
+metadata:
+  name: non-working-hours
+spec:
+  weekdays: "1-5"
+  sleepAt: "18:00"
+  wakeUpAt: "08:00"
+  timeZone: "Europe/Rome"
+  suspendCronJobs: true
+  excludeRef:
+    - apiVersion: "apps/v1"
+      kind:       Deployment
+      name:       no-sleep-deployment
+    - matchLabels: 
+        kube-green.dev/exclude: "true"
+```
+
 ## Cluster Rightsizing
 
 Depending on the Cloud provider there are different options to autoscale and thus rightsize the cluster itself, so that the number of nodes is sufficient to handle the current load but not more.
