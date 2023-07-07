@@ -1,0 +1,52 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: green-eks-k8s
+  region: eu-north-1
+  version: '1.24'
+  tags:
+    karpenter.sh/discovery: green-eks-k8s
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+
+karpenter:
+  version: 'v0.29.0'
+  createServiceAccount: true
+  defaultInstanceProfile: 'KarpenterNodeInstanceProfile'
+  withSpotInterruptionQueue: true
+
+vpc:
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]
+
+managedNodeGroups:
+  - name: green-eks-k8s-ng
+    instanceType: t3.medium
+    amiFamily: AmazonLinux2
+    minSize: 1
+    maxSize: 5
+    desiredCapacity: 3
+    volumeSize: 20
+    ssh:
+      allow: false
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        awsLoadBalancerController: true
+        cloudWatch: true

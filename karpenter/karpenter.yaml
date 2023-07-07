@@ -1,0 +1,36 @@
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+  name: default
+spec:
+  # References cloud provider-specific custom resource
+  providerRef:
+    # the name of the AWSNodeTemplate
+    name: default
+
+  labels:
+    role: karpenter-worker
+
+  requirements:
+    - key: karpenter.sh/capacity-type
+      operator: In
+      values: ["spot"]
+
+  limits:
+    resources:
+      cpu: 1000
+  
+  consolidation: 
+    enabled: true
+  ttlSecondsAfterEmpty: 10
+---
+apiVersion: karpenter.k8s.aws/v1alpha1
+kind: AWSNodeTemplate
+metadata:
+  name: default
+spec:
+  instanceProfile: eksctl-KarpenterNodeInstanceProfile-green-eks-k8s
+  subnetSelector:
+    karpenter.sh/discovery: green-eks-k8s
+  securityGroupSelector:
+    karpenter.sh/discovery: green-eks-k8s

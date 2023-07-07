@@ -43,7 +43,7 @@ bootstrap-gke-flux2:
 		--personal
 
 create-eks-cluster:
-	@eksctl create cluster -r $(AWS_REGION) -f karpenter/green-eks-k8s.yaml
+	@eksctl create cluster -f green-eks-k8s.yaml
 
 bootstrap-eks-flux2:
 	@flux bootstrap github \
@@ -57,7 +57,7 @@ bootstrap-eks-flux2:
 delete-clusters: delete-eks-cluster delete-gke-cluster
 
 delete-eks-cluster:
-	@eksctl delete cluster -r $(AWS_REGION) -f karpenter/green-eks-k8s.yaml
+	@eksctl delete cluster -f green-eks-k8s.yaml
 
 delete-gke-cluster:
 	@gcloud container clusters delete green-gke-k8s --region=$(GCP_REGION) --async --quiet
