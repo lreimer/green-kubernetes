@@ -20,8 +20,11 @@ spec:
     resources:
       cpu: 1000
   
-  consolidation: 
-    enabled: true
+  # Enables consolidation which attempts to reduce cluster cost by both 
+  # removing un-needed nodes and down-sizing those that can't be removed. 
+  # consolidation: 
+  #  enabled: true
+
   ttlSecondsAfterEmpty: 10
 ---
 apiVersion: karpenter.k8s.aws/v1alpha1

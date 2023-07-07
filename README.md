@@ -5,20 +5,25 @@ Showcase repository to demonstrate sustainability projects for Kubernetes.
 ## Setup
 
 ```bash
-# for the GKE setup
 export GITHUB_USER=lreimer
 export GITHUB_TOKEN=
 
+# for the GKE cluster setup
 make create-gke-cluster
 make bootstrap-gke-flux2
 
 kubectl edit service kube-prometheus-stack-grafana -n monitoring
 kubectl edit service goldilocks-dashboard -n goldilocks
 
-
+# for the EKS cluster setup
+make create-eks-cluster
+make bootstrap-eks-flux2
 ```
 
-## Kepler
+## Cluster Planning
+
+Location + Node Types (CPU Arch)
+
 
 ## Workload Rightsizing with VPA and Goldilocks
 
@@ -37,37 +42,6 @@ kubectl describe vpa hamster-vpa
 kubectl get service goldilocks-dashboard -n goldilocks
 kubectl get service goldilocks-dashboard -n goldilocks -o json | jq '.status.loadBalancer.ingress[0].ip'
 open http://<<INSERT_IP_HERE>>:80
-```
-
-## kube-green
-
-Don't waste resources! Many workloads on dev/qa environments stay running during weekends,
-non working hours or at night. _kube-green_ is a simple K8s addon to automatically shutdown
-and restart resources based on when they are needed (or not).
-
-```yaml
-apiVersion: kube-green.com/v1alpha1
-kind: SleepInfo
-metadata:
-  name: non-working-hours
-spec:
-  weekdays: "1-5"
-  sleepAt: "18:00"
-  wakeUpAt: "08:00"
-  timeZone: "Europe/Rome"
-  suspendCronJobs: true
-  excludeRef:
-    - apiVersion: "apps/v1"
-      kind:       Deployment
-      name:       no-sleep-deployment
-    - matchLabels: 
-        kube-green.dev/exclude: "true"
-```
-
-To see some details when the above `SleepInfo` resource will be schedules next, you can have
-a look at the log output from the _kube-green-controller-manager_ pod.
-```bash
-kubectl logs pod/kube-green-controller-manager-5855848d7f-dftxd -n kube-green
 ```
 
 ## Cluster Rightsizing
@@ -109,10 +83,10 @@ gcloud container clusters create green-gke-k8s ... \
 	--num-nodes=1 \
 	--min-nodes=1 --max-nodes=5 \
     
-    # Ampere Altra Arm-Prozessor
-    # currently only available in certain regions
-    # see https://cloud.google.com/compute/docs/regions-zones?hl=de#available
-    --machine-type=t2a-standard-4
+  # Ampere Altra Arm-Prozessor
+  # currently only available in certain regions
+  # see https://cloud.google.com/compute/docs/regions-zones?hl=de#available
+  --machine-type=t2a-standard-4
 ```
 
 ### AWS EKS with Karpenter
@@ -120,6 +94,56 @@ gcloud container clusters create green-gke-k8s ... \
 Karpenter automatically provisions new nodes in response to unschedulable pods. Karpenter does this by observing events within the Kubernetes cluster, and then sending commands to the underlying cloud provider. Currently, only EKS on AWS is supported. See https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/
 
 To easily install EKS with Karpenter, the `eksctl` tool can be used because it brings Karpenter support. See https://eksctl.io/usage/eksctl-karpenter/
+
+## kube-green
+
+Don't waste resources! Many workloads on dev/qa environments stay running during weekends,
+non working hours or at night. _kube-green_ is a simple K8s addon to automatically shutdown
+and restart resources based on when they are needed (or not).
+
+```yaml
+apiVersion: kube-green.com/v1alpha1
+kind: SleepInfo
+metadata:
+  name: non-working-hours
+spec:
+  weekdays: "1-5"
+  sleepAt: "18:00"
+  wakeUpAt: "08:00"
+  timeZone: "Europe/Rome"
+  suspendCronJobs: true
+  excludeRef:
+    - apiVersion: "apps/v1"
+      kind:       Deployment
+      name:       no-sleep-deployment
+    - matchLabels: 
+        kube-green.dev/exclude: "true"
+```
+
+To see some details when the above `SleepInfo` resource will be schedules next, you can have
+a look at the log output from the _kube-green-controller-manager_ pod.
+```bash
+kubectl logs pod/kube-green-controller-manager-5855848d7f-dftxd -n kube-green
+```
+
+## Kepler
+
+Kepler (Kubernetes-based Efficient Power Level Exporter) uses eBPF to probe energy related system stats and exports as Prometheus metrics.
+
+## Prometheus Custom Metrics and HPA
+
+
+## Carbon Aware Scaling with Keda
+
+- https://github.com/Azure/carbon-aware-keda-operator
+
+- Watt Time 
+
+## References
+
+- Cloud Native Sustainabilty Roadmap
+- https://www.techtarget.com/searchitoperations/feature/How-to-approach-sustainability-in-IT-operations
+- https://www.redhat.com/en/blog/how-kepler-project-working-advance-environmentally-conscious-efforts
 
 ## Maintainer
 

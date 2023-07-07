@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - monitoring/
-  - vertical-pod-autoscaler/
-  - goldilocks/
-  - https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
-  - https://github.com/kube-green/kube-green/releases/download/v0.5.1/kube-green.yaml
+  # - kepler/
+  # - vertical-pod-autoscaler/
+  # - goldilocks/
+  
