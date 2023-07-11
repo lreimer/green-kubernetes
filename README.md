@@ -13,11 +13,17 @@ make create-gke-cluster
 make bootstrap-gke-flux2
 
 kubectl edit service kube-prometheus-stack-grafana -n monitoring
+export GRAFANA_HOSTNAME=`kubectl get service kube-prometheus-stack-grafana -n monitoring -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"`
+
 kubectl edit service goldilocks-dashboard -n goldilocks
+export GOLDILOCKS_IP=`kubectl get service goldilocks-dashboard -n goldilocks -o jsonpath="{.status.loadBalancer.ingress[0].ip}"`
 
 # for the EKS cluster setup
 make create-eks-cluster
 make bootstrap-eks-flux2
+
+kubectl edit service kube-prometheus-stack-grafana -n monitoring
+export GRAFANA_HOSTNAME=`kubectl get service kube-prometheus-stack-grafana -n monitoring -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"`
 ```
 
 ## Cluster Planning
@@ -40,8 +46,7 @@ kubectl describe vpa hamster-vpa
 
 # use Goldilocks dashboard to display recommendations
 kubectl get service goldilocks-dashboard -n goldilocks
-kubectl get service goldilocks-dashboard -n goldilocks -o json | jq '.status.loadBalancer.ingress[0].ip'
-open http://<<INSERT_IP_HERE>>:80
+open http://$GOLDILOCKS_IP:80
 ```
 
 ## Cluster Rightsizing
