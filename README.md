@@ -131,18 +131,31 @@ a look at the log output from the _kube-green-controller-manager_ pod.
 kubectl logs pod/kube-green-controller-manager-5855848d7f-dftxd -n kube-green
 ```
 
+## Carbon Aware Scaling with Keda
+
+- https://github.com/Azure/carbon-aware-keda-operator
+- Watt Time 
+
 ## Kepler
 
 Kepler (Kubernetes-based Efficient Power Level Exporter) uses eBPF to probe energy related system stats and exports as Prometheus metrics.
 
+```bash
+# the installation via Helm chart works, but is somewhat incomplete / outdated
+# instead, the installation from source via YAML should be used
+# only working on AWS, on GKE instances some host volumes can't be mounted
+
+git clone https://github.com/sustainable-computing-io/kepler.git
+cd kepler
+make build-manifest OPTS="ESTIMATOR_SIDECAR_DEPLOY PROMETHEUS_DEPLOY MODEL_SERVER_DEPLOY"
+kubectl apply -f _output/generated-manifest/deployment.yaml
+
+kubectl get all -n kepler
+```
+
 ## Prometheus Custom Metrics and HPA
 
-
-## Carbon Aware Scaling with Keda
-
-- https://github.com/Azure/carbon-aware-keda-operator
-
-- Watt Time 
+_TODO_
 
 ## References
 
