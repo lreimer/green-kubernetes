@@ -54,6 +54,9 @@ open http://$GOLDILOCKS_IP:80
 Depending on the Cloud provider there are different options to autoscale and thus rightsize the cluster itself, so that the number of nodes is sufficient to handle the current load but not more.
 
 ```bash
+# add a deployment to demo cluster autoscaling
+kubectl apply -f karpenter/inflate.yaml
+
 # to trigger and watch a cluster ScaleUp
 kubectl scale deployment inflate --replicas 5
 kubectl get pods
