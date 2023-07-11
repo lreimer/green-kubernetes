@@ -28,8 +28,10 @@ export GRAFANA_HOSTNAME=`kubectl get service kube-prometheus-stack-grafana -n mo
 
 ## Cluster Planning
 
-Location + Node Types (CPU Arch)
-
+```bash
+open https://app.electricitymaps.com/map
+open https://cloud.google.com/compute/docs/regions-zones?hl=de#available
+```
 
 ## Workload Rightsizing with VPA and Goldilocks
 
@@ -136,8 +138,26 @@ kubectl logs pod/kube-green-controller-manager-5855848d7f-dftxd -n kube-green
 
 ## Carbon Aware Scaling with Keda
 
-- https://github.com/Azure/carbon-aware-keda-operator
-- Watt Time 
+```bash
+# deploy the normal KEDA scaler
+kubectl apply -f deploy-consumer.yaml
+kubectl apply -f deploy-publisher-job.yaml
+
+# detailled installation instructions can be found in the Github repos
+open https://github.com/Azure/carbon-aware-keda-operator
+open https://github.com/Azure/kubernetes-carbon-intensity-exporter
+
+# you will also need the sources
+git clone https://github.com/Azure/carbon-aware-keda-operator.git
+git clone https://github.com/Azure/kubernetes-carbon-intensity-exporter.git
+
+# check the carbon data
+kubectl get cm -n kube-system carbon-intensity -o jsonpath='{.data}' | jq
+kubectl get cm -n kube-system carbon-intensity -o jsonpath='{.binaryData.data}' | base64 --decode | jq
+
+# deply the carbon aware scaler
+kubectl apply -f carbon-aware-scaler.yaml
+```
 
 ## Kepler
 
