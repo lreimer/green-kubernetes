@@ -196,9 +196,13 @@ kubectl apply -f _output/generated-manifest/deployment.yaml
 kubectl get all -n kepler
 ```
 
+## Scaphandre
+
+https://github.com/hubblo-org/scaphandre
+
 ## Prometheus Custom Metrics and HPA
 
-_TODO_
+https://github.com/kubernetes-sigs/prometheus-adapter
 
 ## References
 
