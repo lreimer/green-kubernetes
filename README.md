@@ -130,13 +130,14 @@ spec:
         kube-green.dev/exclude: "true"
 ```
 
-To see some details when the above `SleepInfo` resource will be schedules next, you can have
-a look at the log output from the _kube-green-controller-manager_ pod.
+To see some details when the above `SleepInfo` resource will be schedules next, you can have a look at the log output from the _kube-green-controller-manager_ pod.
 ```bash
 kubectl logs pod/kube-green-controller-manager-5855848d7f-dftxd -n kube-green
 ```
 
-## Carbon Aware Scaling with Keda
+## Carbon Aware Scaling with KEDA
+
+_KEDA is a Kubernetes-based Event Driven Autoscaler that allows granular scaling of workloads in Kubernetes, based on multiple defined parameters, leveraging the concept of built for purpose scalers. To build a Kubernetes application with carbon aware scaling, we need to implement demand shaping that scales workloads based on the current carbon intensity of the location where the Kubernetes cluster is deployed. To achieve this using KEDA, you can set up the newly introduced KEDA carbon-aware scaler for your Kubernetes workloads and define your carbon intensity scaling thresholds._  (https://www.tfir.io/carbon-aware-kubernetes-scaling-a-step-towards-greener-cloud-computing/)
 
 ```bash
 # deploy the normal KEDA scaler
@@ -148,14 +149,33 @@ open https://github.com/Azure/carbon-aware-keda-operator
 open https://github.com/Azure/kubernetes-carbon-intensity-exporter
 
 # you will also need the sources
-git clone https://github.com/Azure/carbon-aware-keda-operator.git
+# install the intensity exporter
 git clone https://github.com/Azure/kubernetes-carbon-intensity-exporter.git
+cd kubernetes-carbon-intensity-exporter
+
+export WATTTIME_USERNAME=lreimer
+export WATTTIME_PASSWORD=
+export LOCATION=SE
+
+helm install carbon-intensity-exporter \
+        --set carbonDataExporter.region=$LOCATION \
+        --set apiServer.username=$WATTTIME_USERNAME \
+        --set apiServer.password=$WATTTIME_PASSWORD \
+        ./charts/carbon-intensity-exporter
 
 # check the carbon data
 kubectl get cm -n kube-system carbon-intensity -o jsonpath='{.data}' | jq
 kubectl get cm -n kube-system carbon-intensity -o jsonpath='{.binaryData.data}' | base64 --decode | jq
 
+# install the carbon aware operator
+git clone https://github.com/Azure/carbon-aware-keda-operator.git
+cd carbon-aware-keda-operator
+version=$(git describe --abbrev=0 --tags)
+kubectl apply -f "https://github.com/Azure/carbon-aware-keda-operator/releases/download/${version}/carbonawarekedascaler-${version}.yaml"
+
 # deply the carbon aware scaler
+kubectl apply -f deploy-consumer.yaml
+kubectl apply -f deploy-publisher-job.yaml
 kubectl apply -f carbon-aware-scaler.yaml
 ```
 
