@@ -28,6 +28,7 @@ create-gke-cluster:
 		--autoscaling-profile=optimize-utilization \
 		--enable-vertical-pod-autoscaling \
 		--machine-type=e2-medium \
+		--image-type=UBUNTU_CONTAINERD \
 		--logging=SYSTEM \
     	--monitoring=SYSTEM
 	@kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$$(gcloud config get-value core/account)
