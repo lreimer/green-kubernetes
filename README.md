@@ -33,24 +33,6 @@ open https://app.electricitymaps.com/map
 open https://cloud.google.com/compute/docs/regions-zones?hl=de#available
 ```
 
-## Workload Rightsizing with VPA and Goldilocks
-
-```bash
-# explicitly enable goldilocks for the default namespace
-kubectl label ns default goldilocks.fairwinds.com/enabled=true
-
-# create resource and the VPA in recommender mode
-kubectl apply -f vpa/hamster.yaml
-kubectl apply -f vpa/vpa.yaml
-
-# display the container recommendations for CPU and memory
-kubectl describe vpa hamster-vpa
-
-# use Goldilocks dashboard to display recommendations
-kubectl get service goldilocks-dashboard -n goldilocks
-open http://$GOLDILOCKS_IP:80
-```
-
 ## Cluster Rightsizing
 
 Depending on the Cloud provider there are different options to autoscale and thus rightsize the cluster itself, so that the number of nodes is sufficient to handle the current load but not more.
@@ -104,6 +86,24 @@ gcloud container clusters create green-gke-k8s ... \
 Karpenter automatically provisions new nodes in response to unschedulable pods. Karpenter does this by observing events within the Kubernetes cluster, and then sending commands to the underlying cloud provider. Currently, only EKS on AWS is supported. See https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/
 
 To easily install EKS with Karpenter, the `eksctl` tool can be used because it brings Karpenter support. See https://eksctl.io/usage/eksctl-karpenter/
+
+## Workload Rightsizing with VPA and Goldilocks
+
+```bash
+# explicitly enable goldilocks for the default namespace
+kubectl label ns default goldilocks.fairwinds.com/enabled=true
+
+# create resource and the VPA in recommender mode
+kubectl apply -f vpa/hamster.yaml
+kubectl apply -f vpa/vpa.yaml
+
+# display the container recommendations for CPU and memory
+kubectl describe vpa hamster-vpa
+
+# use Goldilocks dashboard to display recommendations
+kubectl get service goldilocks-dashboard -n goldilocks
+open http://$GOLDILOCKS_IP:80
+```
 
 ## kube-green
 
