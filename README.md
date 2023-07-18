@@ -189,6 +189,7 @@ Kepler (Kubernetes-based Efficient Power Level Exporter) uses eBPF to probe ener
 # the installation via Helm chart works, but is somewhat incomplete / outdated
 # instead, the installation from source via YAML should be used
 # only working on AWS, on GKE instances some host volumes can't be mounted
+# using Ubuntu on AWS and GKE now, this should solve the issue
 
 git clone https://github.com/sustainable-computing-io/kepler.git
 cd kepler
