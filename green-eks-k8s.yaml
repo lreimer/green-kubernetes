@@ -35,7 +35,7 @@ cloudWatch:
 managedNodeGroups:
   - name: green-eks-k8s-ng
     instanceType: t3.medium
-    amiFamily: AmazonLinux2
+    amiFamily: Ubuntu2004
     minSize: 1
     maxSize: 5
     desiredCapacity: 3
