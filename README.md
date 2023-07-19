@@ -15,7 +15,7 @@ make create-gke-cluster
 make bootstrap-gke-flux2
 
 kubectl edit service kube-prometheus-stack-grafana -n monitoring
-export GRAFANA_HOSTNAME=`kubectl get service kube-prometheus-stack-grafana -n monitoring -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"`
+export GRAFANA_IP=`kubectl get service kube-prometheus-stack-grafana -n monitoring -o jsonpath="{.status.loadBalancer.ingress[0].ip}"`
 
 kubectl edit service goldilocks-dashboard -n goldilocks
 export GOLDILOCKS_IP=`kubectl get service goldilocks-dashboard -n goldilocks -o jsonpath="{.status.loadBalancer.ingress[0].ip}"`
