@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+    security.openshift.io/scc.podSecurityLabelSync: "false"
     sustainable-computing.io/app: kepler
   name: kepler
 ---
@@ -86,8 +90,7 @@ roleRef:
   name: prometheus-k8s
 subjects:
 - kind: ServiceAccount
-  # name: prometheus-k8s
-  name: kube-prometheus-stack-prometheus
+  name: prometheus-k8s
   namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -117,19 +120,15 @@ data:
   EXPOSE_HW_COUNTER_METRICS: "true"
   EXPOSE_IRQ_COUNTER_METRICS: "true"
   EXPOSE_KUBELET_METRICS: "true"
-  KEPLER_LOG_LEVEL: "1"
+  KEPLER_LOG_LEVEL: "5"
   KEPLER_NAMESPACE: kepler
   METRIC_PATH: /metrics
   MODEL_CONFIG: |
-    CONTAINER_COMPONENTS_ESTIMATOR=true
-    CONTAINER_COMPONENTS_INIT_URL=https://raw.githubusercontent.com/sustainable-computing-io/kepler-model-server/main/tests/test_models/DynComponentPower/CgroupOnly/ScikitMixed.zip
-  MODEL_SERVER_ENABLE: "true"
-  MODEL_SERVER_ENDPOINT: http://kepler-model-server.kepler.svc.cluster.local:8100/model
-  MODEL_SERVER_MODEL_LIST_PATH: /best-models
-  MODEL_SERVER_MODEL_REQ_PATH: /model
-  MODEL_SERVER_PORT: |
-    8100
-  MODEL_SERVER_URL: http://kepler-model-server.kepler.svc.cluster.local:8100
+    CONTAINER_COMPONENTS_ESTIMATOR=false
+    # by default we use buildin weight file
+    # CONTAINER_COMPONENTS_INIT_URL=https://raw.githubusercontent.com/sustainable-computing-io/kepler-model-server/main/tests/test_models/DynComponentModelWeight/CgroupOnly/ScikitMixed/ScikitMixed.json
+  REDFISH_PROBE_INTERVAL_IN_SECONDS: "60"
+  REDFISH_SKIP_SSL_VERIFY: "true"
 kind: ConfigMap
 metadata:
   labels:
@@ -139,18 +138,16 @@ metadata:
 ---
 apiVersion: v1
 data:
-  INITIAL_MODEL_NAMES: |
-    AbsComponentModelWeight=KerasCompWeightFullPipeline
-    AbsComponentPower=KerasCompFullPipeline
-    DynComponentPower=ScikitMixed
-  INITIAL_MODELS_LOC: https://raw.githubusercontent.com/sustainable-computing-io/kepler-model-server/main/tests/test_models
-  MODEL_PATH: /data/models
-kind: ConfigMap
+  redfish.csv: |
+    eW91cl9rdWJlbGV0X25vZGVfbmFtZSxyZWRmaXNoX3VzZXJuYW1lLHJlZGZpc2hfcGFzc3
+    dvcmQsaHR0cHM6Ly9yZWRmaXNoX2lwX29yX2hvc3RuYW1lCg==
+kind: Secret
 metadata:
   labels:
     sustainable-computing.io/app: kepler
-  name: kepler-model-server-cfm
+  name: redfish-4kh9d7bc7m
   namespace: kepler
+type: Opaque
 ---
 apiVersion: v1
 kind: Service
@@ -171,73 +168,6 @@ spec:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: kepler-exporter
     sustainable-computing.io/app: kepler
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: model-server
-    app.kubernetes.io/name: kepler-model-server
-    sustainable-computing.io/app: kepler
-  name: kepler-model-server
-  namespace: kepler
-spec:
-  clusterIP: None
-  ports:
-  - name: http
-    port: 8100
-    targetPort: http
-  selector:
-    app.kubernetes.io/component: model-server
-    app.kubernetes.io/name: kepler-model-server
-    sustainable-computing.io/app: kepler
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/component: model-server
-    app.kubernetes.io/name: kepler-model-server
-    sustainable-computing.io/app: kepler
-  name: kepler-model-server
-  namespace: kepler
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: model-server
-      app.kubernetes.io/name: kepler-model-server
-      sustainable-computing.io/app: kepler
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: model-server
-        app.kubernetes.io/name: kepler-model-server
-        sustainable-computing.io/app: kepler
-    spec:
-      containers:
-      - command:
-        - python3.8
-        - model_server.py
-        image: quay.io/sustainable_computing_io/kepler_model_server:latest
-        imagePullPolicy: Always
-        name: server-api
-        ports:
-        - containerPort: 8100
-          name: http
-        volumeMounts:
-        - mountPath: /etc/kepler/kepler.config
-          name: cfm
-          readOnly: true
-        - mountPath: /data
-          name: model-data
-          readOnly: false
-      volumes:
-      - configMap:
-          name: kepler-model-server-cfm
-        name: cfm
-      - emptyDir: {}
-        name: model-data
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -261,7 +191,8 @@ spec:
     spec:
       containers:
       - args:
-        - until [ -e /tmp/estimator.sock ]; do sleep 1; done && /usr/bin/kepler -v=1
+        - /usr/bin/kepler -v=5 -kernel-source-dir=/usr/share/kepler/kernel_sources
+          -redfish-cred-file-path=/etc/redfish/redfish.csv
         command:
         - /bin/sh
         - -c
@@ -297,8 +228,6 @@ spec:
         securityContext:
           privileged: true
         volumeMounts:
-        - mountPath: /tmp
-          name: tmp
         - mountPath: /lib/modules
           name: lib-modules
         - mountPath: /sys
@@ -308,23 +237,15 @@ spec:
         - mountPath: /etc/kepler/kepler.config
           name: cfm
           readOnly: true
-      - image: quay.io/sustainable_computing_io/kepler-estimator:latest
-        imagePullPolicy: Always
-        name: estimator
-        volumeMounts:
-        - mountPath: /etc/kepler/kepler.config
-          name: cfm
+        - mountPath: /etc/redfish
+          name: redfish
           readOnly: true
-        - mountPath: /tmp
-          name: tmp
       dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: kepler-sa
       tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
       volumes:
-      - emptyDir: {}
-        name: tmp
       - hostPath:
           path: /lib/modules
           type: Directory
@@ -340,6 +261,9 @@ spec:
       - configMap:
           name: kepler-cfm
         name: cfm
+      - name: redfish
+        secret:
+          secretName: redfish-4kh9d7bc7m
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

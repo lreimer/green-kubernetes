@@ -193,7 +193,7 @@ Kepler (Kubernetes-based Efficient Power Level Exporter) uses eBPF to probe ener
 
 git clone https://github.com/sustainable-computing-io/kepler.git
 cd kepler
-make build-manifest OPTS="ESTIMATOR_SIDECAR_DEPLOY PROMETHEUS_DEPLOY MODEL_SERVER_DEPLOY"
+make build-manifest OPTS="PROMETHEUS_DEPLOY"
 kubectl apply -f _output/generated-manifest/deployment.yaml
 
 kubectl get all -n kepler
