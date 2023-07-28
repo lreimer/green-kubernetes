@@ -32,7 +32,8 @@ kind: AWSNodeTemplate
 metadata:
   name: default
 spec:
-  instanceProfile: eksctl-KarpenterNodeInstanceProfile-green-eks-k8s
+  # instanceProfile: eksctl-KarpenterNodeInstanceProfile-green-eks-k8s
+  instanceProfile: KarpenterNodeInstanceProfile
   subnetSelector:
     karpenter.sh/discovery: green-eks-k8s
   securityGroupSelector:
