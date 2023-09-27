@@ -157,12 +157,12 @@ cd kubernetes-carbon-intensity-exporter
 
 export WATTTIME_USERNAME=lreimer
 export WATTTIME_PASSWORD=
-export LOCATION=SE
+export LOCATION=se
 
 helm install carbon-intensity-exporter \
-        --set carbonDataExporter.region=$LOCATION \
-        --set apiServer.username=$WATTTIME_USERNAME \
-        --set apiServer.password=$WATTTIME_PASSWORD \
+        --set carbonDataExporter.region=${LOCATION} \
+        --set apiServer.username=${WATTTIME_USERNAME} \
+        --set apiServer.password=${WATTTIME_PASSWORD} \
         ./charts/carbon-intensity-exporter
 
 # check the carbon data
