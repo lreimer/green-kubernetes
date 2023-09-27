@@ -27,7 +27,7 @@ create-gke-cluster:
 		--enable-autoscaling \
 		--autoscaling-profile=optimize-utilization \
 		--enable-vertical-pod-autoscaling \
-		--machine-type=e2-medium \
+		--machine-type=e2-standard-4 \
 		--image-type=UBUNTU_CONTAINERD \
 		--logging=SYSTEM \
     	--monitoring=SYSTEM
