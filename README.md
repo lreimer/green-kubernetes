@@ -137,7 +137,7 @@ To see some details when the above `SleepInfo` resource will be schedules next, 
 kubectl logs pod/kube-green-controller-manager-5855848d7f-dftxd -n kube-green
 ```
 
-## Carbon Aware Scaling with KEDA
+## Carbon Aware Scaling and Temporal Shifting with KEDA
 
 _KEDA is a Kubernetes-based Event Driven Autoscaler that allows granular scaling of workloads in Kubernetes, based on multiple defined parameters, leveraging the concept of built for purpose scalers. To build a Kubernetes application with carbon aware scaling, we need to implement demand shaping that scales workloads based on the current carbon intensity of the location where the Kubernetes cluster is deployed. To achieve this using KEDA, you can set up the newly introduced KEDA carbon-aware scaler for your Kubernetes workloads and define your carbon intensity scaling thresholds._  (https://www.tfir.io/carbon-aware-kubernetes-scaling-a-step-towards-greener-cloud-computing/)
 
@@ -181,7 +181,7 @@ kubectl apply -f deploy-publisher-job.yaml
 kubectl apply -f carbon-aware-scaler.yaml
 ```
 
-## Kepler
+## Measure Power Usage with Kepler
 
 Kepler (Kubernetes-based Efficient Power Level Exporter) uses eBPF to probe energy related system stats and exports as Prometheus metrics.
 
@@ -198,6 +198,10 @@ kubectl apply -f _output/generated-manifest/deployment.yaml
 
 kubectl get all -n kepler
 ```
+
+## Carbon aware Spatial Shifting with Karmada
+
+https://rossfairbanks.com/2023/07/12/carbon-aware-spatial-shifting-with-karmada/
 
 ## Scaphandre
 
