@@ -1,8 +1,6 @@
 # Green Kubernetes
 
 Showcase repository to demonstrate sustainability projects for Kubernetes.
-Slides from
-my talk at Kubernetes Community Days Munich can be found [here](https://speakerdeck.com/lreimer/blue-turns-green-approaches-and-technologies-for-sustainable-k8s-clusters-number-kcdmunich).
 
 ## Setup
 
