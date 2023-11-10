@@ -60,6 +60,7 @@ delete-clusters: delete-eks-cluster delete-gke-cluster
 delete-eks-cluster:
 	@eksctl delete cluster --region=eu-north-1 --name=green-eks-k8s
 	@aws cloudformation delete-stack --region eu-central-1 --stack-name eksctl-green-eks-k8s-cluster
+	@aws cloudformation delete-stack --region eu-north-1 --stack-name eksctl-green-eks-k8s-cluster
 
 delete-gke-cluster:
 	@gcloud container clusters delete green-gke-k8s --region=$(GCP_REGION) --async --quiet
