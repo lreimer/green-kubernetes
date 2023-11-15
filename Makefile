@@ -55,7 +55,7 @@ bootstrap-eks-flux2:
 		--read-write-key \
 		--personal
 
-delete-clusters: delete-eks-cluster delete-gke-cluster
+delete-clusters: delete-gke-cluster delete-eks-cluster
 
 delete-eks-cluster:
 	@eksctl delete cluster --region=eu-north-1 --name=green-eks-k8s
