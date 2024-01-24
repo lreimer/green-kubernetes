@@ -35,8 +35,9 @@ cloudWatch:
 managedNodeGroups:
   - name: green-eks-k8s-ng
     instanceType: t3.medium
-    # We use the default amiFamily, because eksctl doesn't support "Ubuntu2204" yet and Ubuntu 20.04 doesn't support cgroup v2, which is required for Kepler.
-    amiFamily: AmazonLinux2
+    # We use Bottlerocket, because Kepler needs support for cgroup v2, which neither Amazon Linux 2 nor Ubuntu 20.04 LTS have.
+    # Ubuntu 22.04 and Amazon Linux 2023 do support cgroup v2, but these are not supported by eksctl yet.
+    amiFamily: Bottlerocket
     minSize: 1
     maxSize: 5
     desiredCapacity: 3
