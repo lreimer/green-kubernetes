@@ -11,14 +11,14 @@ GCP_REGION ?= europe-north1
 GCP_ZONE ?= europe-north1-b
 
 prepare-gke-cluster:
-	@gcloud config set compute/region europe-west1
-	@gcloud config set compute/zone europe-west1-b
+	@gcloud config set compute/region $(GCP_REGION)
+	@gcloud config set compute/zone $(GCP_ZONE)
 	@gcloud config set container/use_client_certificate False
 
 create-gke-cluster:
 	@gcloud container clusters create green-gke-k8s \
 		--release-channel=regular \
-		--cluster-version=1.26 \
+		--cluster-version=1.27 \
 		--region=$(GCP_REGION) \
 		--addons HttpLoadBalancing,HorizontalPodAutoscaling \
 		--workload-pool=$(GCP_PROJECT).svc.id.goog \
