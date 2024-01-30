@@ -116,17 +116,16 @@ data:
   ENABLE_EBPF_CGROUPID: "true"
   ENABLE_GPU: "true"
   ENABLE_PROCESS_METRICS: "false"
-  EXPOSE_CGROUP_METRICS: "true"
+  ENABLE_QAT: "false"
+  EXPOSE_CGROUP_METRICS: "false"
   EXPOSE_HW_COUNTER_METRICS: "true"
   EXPOSE_IRQ_COUNTER_METRICS: "true"
-  EXPOSE_KUBELET_METRICS: "true"
-  KEPLER_LOG_LEVEL: "5"
+  KEPLER_LOG_LEVEL: "1"
   KEPLER_NAMESPACE: kepler
   METRIC_PATH: /metrics
   MODEL_CONFIG: |
     CONTAINER_COMPONENTS_ESTIMATOR=false
-    # by default we use buildin weight file
-    # CONTAINER_COMPONENTS_INIT_URL=https://raw.githubusercontent.com/sustainable-computing-io/kepler-model-server/main/tests/test_models/DynComponentModelWeight/CgroupOnly/ScikitMixed/ScikitMixed.json
+  PROMETHEUS_SCRAPE_INTERVAL: 30s
   REDFISH_PROBE_INTERVAL_IN_SECONDS: "60"
   REDFISH_SKIP_SSL_VERIFY: "true"
 kind: ConfigMap
@@ -191,7 +190,7 @@ spec:
     spec:
       containers:
       - args:
-        - /usr/bin/kepler -v=5 -kernel-source-dir=/usr/share/kepler/kernel_sources
+        - /usr/bin/kepler -v=1 -kernel-source-dir=/usr/share/kepler/kernel_sources
           -redfish-cred-file-path=/etc/redfish/redfish.csv
         command:
         - /bin/sh
@@ -230,10 +229,14 @@ spec:
         volumeMounts:
         - mountPath: /lib/modules
           name: lib-modules
+          readOnly: true
         - mountPath: /sys
           name: tracing
+          readOnly: true
         - mountPath: /proc
           name: proc
+        - mountPath: /var/run
+          name: var-run
         - mountPath: /etc/kepler/kepler.config
           name: cfm
           readOnly: true
@@ -241,6 +244,7 @@ spec:
           name: redfish
           readOnly: true
       dnsPolicy: ClusterFirstWithHostNet
+      hostPID: true
       serviceAccountName: kepler-sa
       tolerations:
       - effect: NoSchedule
@@ -258,12 +262,62 @@ spec:
           path: /proc
           type: Directory
         name: proc
+      - hostPath:
+          path: /var/run
+          type: Directory
+        name: var-run
       - configMap:
           name: kepler-cfm
         name: cfm
       - name: redfish
         secret:
           secretName: redfish-4kh9d7bc7m
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/part-of: kepler
+    sustainable-computing.io/app: kepler
+  name: kepler-common-rules
+  namespace: kepler
+spec:
+  groups:
+  - interval: 1m
+    name: kepler-common-rules
+    rules:
+    - expr: |
+        sum by(container_namespace, pod_name) (
+          increase(kepler_container_joules_total[24h:2m])
+        )
+      record: kepler:container_joules_total:increase:24h:by_ns_pod
+    - expr: "sum by(container_namespace) ( \n  kepler:container_joules_total:increase:24h:by_ns_pod
+        \n)\n"
+      record: kepler:container_joules_total:increase:24h:by_ns
+  - interval: 30s
+    name: kepler-low-res-rules
+    rules:
+    - expr: |
+        sum by (container_namespace, pod_name) (
+          irate(kepler_container_package_joules_total[2m])
+        )
+      record: kepler:container_package_watts:2m:by_ns_pod
+    - expr: |
+        sum by (container_namespace, pod_name) (
+          irate(kepler_container_dram_joules_total[2m])
+        )
+      record: kepler:container_dram_watts:2m:by_ns_pod
+    - expr: |
+        sum by (container_namespace, pod_name) (
+          irate(kepler_container_other_joules_total[2m])
+        )
+      record: kepler:container_other_watts:2m:by_ns_pod
+    - expr: |
+        sum by (container_namespace, pod_name) (
+          irate(kepler_container_gpu_joules_total[2m])
+        )
+      record: kepler:container_gpu_watts:2m:by_ns_pod
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -277,7 +331,7 @@ metadata:
   namespace: monitoring
 spec:
   endpoints:
-  - interval: 3s
+  - interval: 30s
     port: http
     relabelings:
     - action: replace
@@ -294,4 +348,3 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: exporter
-      app.kubernetes.io/name: kepler-exporter
