@@ -1,0 +1,29 @@
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: nginx-region-propagation
+spec:
+  resourceSelectors:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: nginx
+  placement:
+    clusterAffinity:
+      fieldSelector:
+        matchExpressions:
+        - key: region
+          operator: In
+          values:
+          - europe-north1
+          - eu-north-1
+        - key: region
+          operator: NotIn
+          values:
+          - eu-central-1
+          - europe-west1
+    replicaScheduling:
+      # possible options here are Duplicated and Divided
+      replicaSchedulingType: Duplicated
+      
+      # replicaSchedulingType: Divided
+      # replicaDivisionPreference: Aggregated

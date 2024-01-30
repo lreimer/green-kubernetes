@@ -207,6 +207,32 @@ kubectl get all -n kepler
 
 https://rossfairbanks.com/2023/07/12/carbon-aware-spatial-shifting-with-karmada/
 
+```bash
+# make sure you are running on a local K8s
+kubectl ctx rancher-desktop
+kubectl karmada init
+kubectl karmada init --karmada-data=$PWD/.karmada --karmada-pki=$PWD/.karmada/pki --karmada-apiserver-advertise-address=127.0.0.1 --etcd-storage-mode=emptyDir --cert-external-ip=127.0.0.1
+
+# next we join the GKE clusters
+kubectl karmada join eks-cluster --kubeconfig $PWD/.karmada/karmada-apiserver.config --cluster-kubeconfig=$HOME/.kube/config --cluster-context=mario-leander.reimer@green-eks-k8s.eu-north-1.eksctl.io --cluster-provider=aws --cluster-region=eu-north-1
+kubectl karmada join gke-cluster --kubeconfig $PWD/.karmada/karmada-apiserver.config --cluster-kubeconfig=$HOME/.kube/config --cluster-context=gke_cloud-native-experience-lab_europe-north1_green-gke-k8s --cluster-provider=gcp --cluster-region=europe-north1
+
+# see the cluster details
+kubectl --kubeconfig /Users/mario-leander.reimer/Projekte/green-kubernetes/.karmada/karmada-apiserver.config get clusters
+kubectl --kubeconfig /Users/mario-leander.reimer/Projekte/green-kubernetes/.karmada/karmada-apiserver.config describe cluster gke-cluster
+
+# deploy workload and propagation policy
+kubectl --kubeconfig /Users/mario-leander.reimer/Projekte/green-kubernetes/.karmada/karmada-apiserver.config apply -f karmada/nginx-deployment.yaml
+kubectl --kubeconfig /Users/mario-leander.reimer/Projekte/green-kubernetes/.karmada/karmada-apiserver.config apply -f karmada/propagationpolicy-region.yaml
+
+kubectl ctx mario-leander.reimer@green-eks-k8s.eu-north-1.eksctl.io
+kubectl get all
+
+kubectl ctx gke_cloud-native-experience-lab_europe-north1_green-gke-k8s
+kubectl get all
+```
+
+
 ## Scaphandre
 
 https://github.com/hubblo-org/scaphandre

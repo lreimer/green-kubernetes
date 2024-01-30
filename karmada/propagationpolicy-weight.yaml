@@ -1,7 +1,7 @@
 apiVersion: policy.karmada.io/v1alpha1
 kind: PropagationPolicy
 metadata:
-  name: nginx-propagation
+  name: nginx-weight-propagation
 spec:
   resourceSelectors:
     - apiVersion: apps/v1
@@ -10,18 +10,18 @@ spec:
   placement:
     clusterAffinity:
       clusterNames:
-        - clusterA
-        - clusterB
+        - eks-cluster
+        - gke-cluster
     replicaScheduling:
-      replicaDivisionPreference: Weighted
       replicaSchedulingType: Divided
+      replicaDivisionPreference: Weighted
       weightPreference:
         staticWeightList:
           - targetCluster:
               clusterNames:
-                - clusterA
+                - eks-cluster
             weight: 1
           - targetCluster:
               clusterNames:
-                - clusterB
+                - gke-cluster
             weight: 0
