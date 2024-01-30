@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
-      version: "54.1.0"
+      version: "56.0.3"
   interval: 1h0m0s
   releaseName: kube-prometheus-stack
   targetNamespace: monitoring
