@@ -14,4 +14,3 @@ spec:
   interval: 1h0m0s
   releaseName: goldilocks
   targetNamespace: goldilocks
-  createNamespace: true
