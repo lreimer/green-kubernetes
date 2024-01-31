@@ -9,7 +9,7 @@ spec:
       chart: vpa
       sourceRef:
         kind: HelmRepository
-        name: fairwinds-stable
+        name: fairwinds-stable-vpa
       version: "4.4.1"
   interval: 1h0m0s
   releaseName: vpa

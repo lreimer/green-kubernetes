@@ -9,7 +9,7 @@ spec:
       chart: goldilocks
       sourceRef:
         kind: HelmRepository
-        name: fairwinds-stable
+        name: fairwinds-stable-goldilocks
       version: "8.0.1"
   interval: 1h0m0s
   releaseName: goldilocks
