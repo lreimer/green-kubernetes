@@ -14,3 +14,7 @@ spec:
   interval: 1h0m0s
   releaseName: goldilocks
   targetNamespace: goldilocks
+  remediation:
+    retries: 10
+    retryBackoff: 30s
+    timeout: 5m0s
