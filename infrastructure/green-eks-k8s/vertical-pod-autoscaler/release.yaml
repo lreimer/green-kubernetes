@@ -1,16 +1,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: goldilocks
+  name: vpa
   namespace: flux-system
 spec:
   chart:
     spec:
-      chart: goldilocks
+      chart: vpa
       sourceRef:
         kind: HelmRepository
         name: fairwinds-stable
-      version: "8.0.1"
+      version: "4.4.1"
   interval: 1h0m0s
-  releaseName: goldilocks
-  targetNamespace: goldilocks
+  releaseName: vpa
+  targetNamespace: kube-system

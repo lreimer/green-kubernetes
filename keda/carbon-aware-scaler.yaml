@@ -17,9 +17,9 @@ spec:
   
   maxReplicasByCarbonIntensity:            # array of carbon intensity values in ascending order; each threshold value represents the upper limit and previous entry represents lower limit 
     - carbonIntensityThreshold: 437        # when carbon intensity is 437 or below 
-      maxReplicas: 100                     # do more 
+      maxReplicas: 50                     # do more 
     - carbonIntensityThreshold: 504        # when carbon intensity is >437 and <=504 
-      maxReplicas: 50                      # do medium
+      maxReplicas: 25                      # do medium
     - carbonIntensityThreshold: 571        # when carbon intensity is >504 and <=571 (and beyond) 
       maxReplicas: 10                      # do less 
 
