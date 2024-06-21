@@ -111,7 +111,6 @@ subjects:
 apiVersion: v1
 data:
   BIND_ADDRESS: 0.0.0.0:9102
-  CGROUP_METRICS: '*'
   CPU_ARCH_OVERRIDE: ""
   ENABLE_EBPF_CGROUPID: "true"
   ENABLE_GPU: "true"
@@ -190,8 +189,7 @@ spec:
     spec:
       containers:
       - args:
-        - /usr/bin/kepler -v=1 -kernel-source-dir=/usr/share/kepler/kernel_sources
-          -redfish-cred-file-path=/etc/redfish/redfish.csv
+        - /usr/bin/kepler -v=1 -redfish-cred-file-path=/etc/redfish/redfish.csv
         command:
         - /bin/sh
         - -c
@@ -292,8 +290,10 @@ spec:
           increase(kepler_container_joules_total[24h:2m])
         )
       record: kepler:container_joules_total:increase:24h:by_ns_pod
-    - expr: "sum by(container_namespace) ( \n  kepler:container_joules_total:increase:24h:by_ns_pod
-        \n)\n"
+    - expr: |
+        sum by(container_namespace) (
+          kepler:container_joules_total:increase:24h:by_ns_pod
+        )
       record: kepler:container_joules_total:increase:24h:by_ns
   - interval: 30s
     name: kepler-low-res-rules
