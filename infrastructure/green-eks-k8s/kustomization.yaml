@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
   - monitoring/
-  # - kepler/
+  - kepler/
   - vertical-pod-autoscaler/
   - goldilocks/
   - https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
